@@ -4,7 +4,9 @@
 
 using namespace std;
 
-vector<vector<float>> readFile(string filename);
-void outputXYPairs(vector<vector<float>> pairs, int npairs);
-float calculate_magnitude(vector<float> xyPair);
-vector<float> magnitudeOfAllPairs(vector<vector<float>> pairs);
+vector<pair<float, float>> readFile(string);
+void outputXYPairs(vector<pair<float, float>>, int);
+float calculate_magnitude(vector<float>);
+vector<float> magnitudeOfAllPairs(vector<pair<float, float>>);
+pair<float, float> fitStraightLine(vector<pair<float, float>>);
+void fitLineSaveAndOutput(vector<pair<float, float>>);
