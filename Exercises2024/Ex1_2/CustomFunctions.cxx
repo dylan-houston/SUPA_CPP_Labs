@@ -3,16 +3,21 @@
 #include <string>
 #include <vector>
 #include <cmath>
-#include "Custom-Functions.h"
+#include "CustomFunctions.h"
 
 using namespace std;
+
+
+void print(string s) {
+    cout << s << endl;
+}
 
 vector<pair<float, float>> readFile(string filename) {
     // open the file
     ifstream filestream;
     filestream.open(filename);
     if (filestream.fail()) {
-        cout << "File IO Failed";
+        print("File IO Failed");
         exit(1);
     }
 
@@ -43,15 +48,13 @@ vector<pair<float, float>> readFile(string filename) {
 
 void outputXYPairs(vector<pair<float, float>> data, int npairs) {
     if (npairs > data.size()) {
-        cout << "WARNING: You have requested more lines to be output than exist." << endl;
-        cout << "Outputting the first 5 lines..." << endl;
+        print("WARNING: You have requested more lines to be output than exist.");
+        print("Outputting the first 5 lines...");
         npairs = 5;
     }
 
-    for (int i = 0; i < npairs; i++) {
-        pair<float, float> xy_pair = data[i];
-        cout << xy_pair.first << ", " << xy_pair.second << endl;
-    }
+    vector<pair<float, float>> sub_data(data.begin(), data.begin() + npairs);
+    print(sub_data);
 }
 
 float calculate_magnitude(pair<float, float> xyPair) {
@@ -63,12 +66,13 @@ float calculate_magnitude(pair<float, float> xyPair) {
 
 vector<float> magnitudeOfAllPairs(vector<pair<float, float>> pairs) {
     vector<float> magnitudes;
-    cout << "Magnitudes:" << endl;
+    print("Magnitudes:");
     for (pair<float, float> xy_pair : pairs) {
         float mag = calculate_magnitude(xy_pair);
         magnitudes.push_back(mag);
-        cout << mag << endl;
+        //cout << mag << endl;
     }
+    print(magnitudes);
     return magnitudes;
 }
 
@@ -93,6 +97,19 @@ pair<float, float> fitStraightLine(vector<pair<float, float>> data) {
     pq_pair.second = (sum_x2 * sum_y - sum_xy * sum_x) / denom;
 
     return pq_pair;
+}
+
+float chi2(vector<pair<float, float>> data, vector<pair<float, float>> errors, pair<float, float> fit_pq) {
+    float chi2 = 0;
+    for (int i=0; i < data.size(); i++) {
+        float prediction = data[i].first * fit_pq.first + fit_pq.second;
+        float chi2_i = pow(data[i].second - prediction, 2);
+        // Jonathan told me this is the error
+        float error = errors[i].second + prediction * errors[i].first;
+        chi2_i /= pow(error, 2);
+        chi2 += chi2_i;
+    }
+    return chi2;
 }
 
 void fitLineSaveAndOutput(vector<pair<float, float>> data) {

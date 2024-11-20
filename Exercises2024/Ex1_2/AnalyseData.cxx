@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Custom-Functions.h"
+#include "CustomFunctions.h"
 
 using namespace std;
 

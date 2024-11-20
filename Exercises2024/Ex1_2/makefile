@@ -1,17 +1,17 @@
 CC=g++
-FLAGS=-std=c++20 -w
-TARGET=Analyse-Data
-OBJECTS=Custom-Functions.o Analyse-Data.o
+FLAGS=-std=c++20
+TARGET=AnalyseData
+OBJECTS=CustomFunctions.o AnalyseData.o
 
 ${TARGET} : ${OBJECTS}
 	${CC} ${FLAGS} ${OBJECTS} -o ${TARGET}
 	@make clean
 
-Custom-Functions.o : Custom-Functions.cxx Custom-Functions.h
-	${CC} ${FLAGS} -c Custom-Functions.cxx
+CustomFunctions.o : CustomFunctions.cxx
+	${CC} ${FLAGS} -c CustomFunctions.cxx
 
-Analyse-Data.o : Analyse-Data.cxx Custom-Functions.h
-	${CC} ${FLAGS} -c Analyse-Data.cxx
+AnalyseData.o : AnalyseData.cxx
+	${CC} ${FLAGS} -c AnalyseData.cxx
 
 clean:
 	@rm -f *.o
