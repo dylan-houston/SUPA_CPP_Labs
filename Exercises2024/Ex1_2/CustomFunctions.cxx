@@ -132,3 +132,24 @@ pair<float, float> fitLineSaveAndOutput(vector<pair<float, float>> data, vector<
     outStream.close();
     return pq;
 }
+
+vector<float> xPowOfyAllPairs(vector<pair<float, float>> pairs) {
+    vector<float> results;
+    for (pair<float, float> xy_pair : pairs) {
+        int int_y = round(xy_pair.second);
+        float res = xPowOfy(xy_pair.first, int_y);
+        results.push_back(res);
+    }
+    print(results);
+    return results;
+}
+
+float xPowOfy(float x, int y) {
+    if (y == 0) {
+        return 1.0;
+    } else if (y >= 1) {
+        return x * xPowOfy(x, y - 1);
+    } else {
+        return (1/x) * xPowOfy(x, y + 1);
+    }
+}

@@ -12,6 +12,8 @@ vector<float> magnitudeOfAllPairs(vector<pair<float, float>>);
 pair<float, float> fitStraightLine(vector<pair<float, float>>);
 pair<float, float> fitLineSaveAndOutput(vector<pair<float, float>>, vector<pair<float, float>>);
 float chi2NDF(vector<pair<float, float>>, vector<pair<float, float>>, pair<float, float>);
+vector<float> xPowOfyAllPairs(vector<pair<float, float>>);
+float xPowOfy(float, int);
 
 
 // print functions

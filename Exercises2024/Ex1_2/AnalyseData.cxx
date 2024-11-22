@@ -9,5 +9,6 @@ int main() {
     outputXYPairs(data, 6);
     magnitudeOfAllPairs(data);
     pair<float, float> fit = fitLineSaveAndOutput(data, errors);
+    vector<float> x2they = xPowOfyAllPairs(data);
     return 0;
 }
