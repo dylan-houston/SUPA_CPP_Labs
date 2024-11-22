@@ -6,15 +6,23 @@
 using namespace std;
 
 vector<pair<float, float>> readFile(string);
+
 void outputXYPairs(vector<pair<float, float>>, int);
+
 float calculate_magnitude(vector<float>);
 vector<float> magnitudeOfAllPairs(vector<pair<float, float>>);
+
 pair<float, float> fitStraightLine(vector<pair<float, float>>);
 pair<float, float> fitLineSaveAndOutput(vector<pair<float, float>>, vector<pair<float, float>>);
 float chi2NDF(vector<pair<float, float>>, vector<pair<float, float>>, pair<float, float>);
+
 vector<float> xPowOfyAllPairs(vector<pair<float, float>>);
 float xPowOfy(float, int);
 
+void printAndSaveToFile(vector<float>, string);
+
+template<typename T>
+void printAndSaveToFile(pair<T, T>, float, string);
 
 // print functions
 void print(string);

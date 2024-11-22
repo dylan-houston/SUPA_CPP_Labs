@@ -66,12 +66,10 @@ float calculate_magnitude(pair<float, float> xyPair) {
 
 vector<float> magnitudeOfAllPairs(vector<pair<float, float>> pairs) {
     vector<float> magnitudes;
-    print("Magnitudes:");
     for (pair<float, float> xy_pair : pairs) {
         float mag = calculate_magnitude(xy_pair);
         magnitudes.push_back(mag);
     }
-    print(magnitudes);
     return magnitudes;
 }
 
@@ -118,18 +116,7 @@ float chi2NDF(vector<pair<float, float>> data, vector<pair<float, float>> errors
 pair<float, float> fitLineSaveAndOutput(vector<pair<float, float>> data, vector<pair<float, float>> errors) {
     pair<float, float> pq = fitStraightLine(data);
     float chi2NDF_res = chi2NDF(data, errors, pq);
-    printf("y = %f * x + %f\n", pq.first, pq.second);
-    printf("chi2/NDF = %f\n", chi2NDF_res);
-    
-    ofstream outStream;
-    outStream.open("linefit.txt");
-    if (!outStream.is_open()) {
-        cout << "Error opening file!" << endl;
-        return pq;
-    }
-
-    outStream << "y = " << pq.first << " * x + " << pq.second << endl;
-    outStream.close();
+    printAndSaveToFile(pq, chi2NDF_res, "fit-results.txt");
     return pq;
 }
 
@@ -140,7 +127,6 @@ vector<float> xPowOfyAllPairs(vector<pair<float, float>> pairs) {
         float res = xPowOfy(xy_pair.first, int_y);
         results.push_back(res);
     }
-    print(results);
     return results;
 }
 
@@ -152,4 +138,39 @@ float xPowOfy(float x, int y) {
     } else {
         return (1/x) * xPowOfy(x, y + 1);
     }
+}
+
+void printAndSaveToFile(vector<float> data, string filename) {
+    print(data);
+
+    ofstream outStream;
+    outStream.open(filename);
+    if (!outStream.is_open()) {
+        cout << "Error opening file!" << endl;
+        return;
+    }
+
+    print("Writing to file...");
+    for (float point : data) {
+        outStream << point << endl;
+    }
+    outStream.close();
+}
+
+template<typename T>
+void printAndSaveToFile(pair<T, T> fit_data, float chi2NDF, string filename) {
+    printf("y = %f * x + %f\n", fit_data.first, fit_data.second);
+    printf("chi^2/NDF = %f\n", chi2NDF);
+
+    ofstream outStream;
+    outStream.open(filename);
+    if (!outStream.is_open()) {
+        cout << "Error opening file!" << endl;
+        return;
+    }
+
+    print("Writing to file...");
+    outStream << "y = " << fit_data.first << " * x + " << fit_data.second << endl;
+    outStream << "chi^2/NDF = " << chi2NDF << endl;
+    outStream.close();
 }
