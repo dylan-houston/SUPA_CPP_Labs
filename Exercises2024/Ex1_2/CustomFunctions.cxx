@@ -70,7 +70,6 @@ vector<float> magnitudeOfAllPairs(vector<pair<float, float>> pairs) {
     for (pair<float, float> xy_pair : pairs) {
         float mag = calculate_magnitude(xy_pair);
         magnitudes.push_back(mag);
-        //cout << mag << endl;
     }
     print(magnitudes);
     return magnitudes;
@@ -99,7 +98,7 @@ pair<float, float> fitStraightLine(vector<pair<float, float>> data) {
     return pq_pair;
 }
 
-float chi2(vector<pair<float, float>> data, vector<pair<float, float>> errors, pair<float, float> fit_pq) {
+float chi2NDF(vector<pair<float, float>> data, vector<pair<float, float>> errors, pair<float, float> fit_pq) {
     float chi2 = 0;
     for (int i=0; i < data.size(); i++) {
         float prediction = data[i].first * fit_pq.first + fit_pq.second;
@@ -109,19 +108,27 @@ float chi2(vector<pair<float, float>> data, vector<pair<float, float>> errors, p
         chi2_i /= pow(error, 2);
         chi2 += chi2_i;
     }
-    return chi2;
+
+    // NDF is the number of rows in the data
+    int NDF = data.size();
+
+    return chi2/NDF;
 }
 
-void fitLineSaveAndOutput(vector<pair<float, float>> data) {
+pair<float, float> fitLineSaveAndOutput(vector<pair<float, float>> data, vector<pair<float, float>> errors) {
     pair<float, float> pq = fitStraightLine(data);
-    cout << "y = " << pq.first << " * x + " << pq.second << endl;
+    float chi2NDF_res = chi2NDF(data, errors, pq);
+    printf("y = %f * x + %f\n", pq.first, pq.second);
+    printf("chi2/NDF = %f\n", chi2NDF_res);
     
     ofstream outStream;
     outStream.open("linefit.txt");
     if (!outStream.is_open()) {
         cout << "Error opening file!" << endl;
-        return;
+        return pq;
     }
+
     outStream << "y = " << pq.first << " * x + " << pq.second << endl;
     outStream.close();
+    return pq;
 }

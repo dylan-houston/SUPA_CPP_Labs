@@ -10,13 +10,13 @@ void outputXYPairs(vector<pair<float, float>>, int);
 float calculate_magnitude(vector<float>);
 vector<float> magnitudeOfAllPairs(vector<pair<float, float>>);
 pair<float, float> fitStraightLine(vector<pair<float, float>>);
-void fitLineSaveAndOutput(vector<pair<float, float>>);
-float chi2(vector<pair<float, float>>, vector<pair<float, float>>, pair<float, float>);
-
-void print(string);
+pair<float, float> fitLineSaveAndOutput(vector<pair<float, float>>, vector<pair<float, float>>);
+float chi2NDF(vector<pair<float, float>>, vector<pair<float, float>>, pair<float, float>);
 
 
 // print functions
+void print(string);
+
 template<typename T>
 void print(vector<pair<T, T>> data){
     for (pair<T, T> xy_pair : data) {
