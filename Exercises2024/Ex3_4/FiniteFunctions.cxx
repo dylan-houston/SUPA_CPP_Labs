@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
 #include "FiniteFunctions.h"
 #include <filesystem> //To check extensions in a nice way
 
@@ -62,8 +63,20 @@ Integration by hand (output needed to normalise function when plotting)
 ###################
 */ 
 double FiniteFunction::integrate(int Ndiv){ //private
-  //ToDo write an integrator
-  return -99;  
+  double x_inc = (this->rangeMax() - this->rangeMin()) / (Ndiv - 1);
+
+  // implement trapezium rule
+  double integral = 0.0;
+  for (int i=0; i<Ndiv; i++) {
+    double val = this->callFunction(this->rangeMin() + i * x_inc);
+    if (i==0 || i==Ndiv-1) {
+      val *= 0.5;
+    }
+    integral += val;
+  }
+  integral *= x_inc;
+
+  return integral;  
 }
 double FiniteFunction::integral(int Ndiv) { //public
   if (Ndiv <= 0){
@@ -233,5 +246,149 @@ void FiniteFunction::generatePlot(Gnuplot &gp){
     gp << "set xrange ["<<m_RMin<<":"<<m_RMax<<"]\n";
     gp << "plot '-' with points ps 2 lc rgb 'blue' title 'sampled data'\n";
     gp.send1d(m_samples);
+  }
+}
+
+
+/*
+###################
+//Normal Distribution
+###################
+*/
+NormalDist::NormalDist(){
+  m_RMin = -5.0;
+  m_RMax = 5.0;
+  this->checkPath("NormalDist");
+  m_Integral = NULL;
+}
+
+NormalDist::NormalDist(double mu, double sigma, double range_min, double range_max, std::string outfile) {
+  m_RMin = range_min;
+  m_RMax = range_max;
+  m_Integral = NULL;
+  this->checkPath(outfile);
+  m_mu = mu;
+  m_sigma = sigma;
+}
+
+void NormalDist::printInfo() {
+  std::cout << "     rangeMin: " << m_RMin << std::endl;
+  std::cout << "     rangeMax: " << m_RMax << std::endl;
+  std::cout << "     integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
+  std::cout << "     function: " << m_FunctionName << std::endl;
+  std::cout << "         mean: " << m_mu << std::endl;
+  std::cout << "std deviation: " << m_sigma << std::endl;
+}
+
+double NormalDist::callFunction(double x) {return this->normal(x);};
+
+double NormalDist::normal(double x) {
+  return 1.0 / (m_sigma * pow(2*M_PI, 0.5)) * exp(-0.5*pow((x - m_mu) / m_sigma, 2));
+}
+
+
+/*
+###################
+//Cauchy-Lorentz
+###################
+*/
+CauchyLorentzDist::CauchyLorentzDist(){
+  m_RMin = -5.0;
+  m_RMax = 5.0;
+  this->checkPath("CauchyLorentzDist");
+  m_Integral = NULL;
+}
+
+CauchyLorentzDist::CauchyLorentzDist(double x0, double gamma, double range_min, double range_max, std::string outfile) {
+  m_RMin = range_min;
+  m_RMax = range_max;
+  m_Integral = NULL;
+  this->checkPath(outfile);
+  m_x0 = x0;
+  if (gamma > 0) {
+    m_gamma = gamma;
+  } else {
+    std::cout << "gamma must be > 0, choosing gamma = 1 by default" << std::endl;
+    m_gamma = 1.0;
+  }
+}
+
+void CauchyLorentzDist::printInfo() {
+  std::cout << "rangeMin: " << m_RMin << std::endl;
+  std::cout << "rangeMax: " << m_RMax << std::endl;
+  std::cout << "integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
+  std::cout << "function: " << m_FunctionName << std::endl;
+  std::cout << "      x0: " << m_x0 << std::endl;
+  std::cout << "   gamma: " << m_gamma << std::endl;
+}
+
+double CauchyLorentzDist::callFunction(double x) {return this->cauchyLorentz(x);};
+
+double CauchyLorentzDist::cauchyLorentz(double x) {
+  return 1.0 / (M_PI * m_gamma * (1 + pow((x - m_x0) / m_gamma, 2)));
+}
+
+
+/*
+###################
+//CrystalBall
+###################
+*/
+CrystalBallDist::CrystalBallDist(){
+  m_RMin = -5.0;
+  m_RMax = 5.0;
+  this->checkPath("CrystalBallDist");
+  m_Integral = NULL;
+}
+
+CrystalBallDist::CrystalBallDist(double xb, double sigma, double alpha, double n, double range_min, double range_max, std::string outfile) {
+  m_RMin = range_min;
+  m_RMax = range_max;
+  m_Integral = NULL;
+  this->checkPath(outfile);
+  m_xb = xb;
+  m_sigma = sigma;
+
+  if (n > 1) {
+    m_n = n;
+  } else {
+    std::cout << "n must be > 1, choosing n = 2 by default" << std::endl;
+    m_n = 2.0;
+  }
+
+  if (alpha > 1) {
+    m_alpha = alpha;
+  } else {
+    std::cout << "alpha must be > 0, choosing alpha = 1 by default" << std::endl;
+    m_alpha = 1.0;
+  }
+}
+
+void CrystalBallDist::printInfo() {
+  std::cout << "rangeMin: " << m_RMin << std::endl;
+  std::cout << "rangeMax: " << m_RMax << std::endl;
+  std::cout << "integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
+  std::cout << "function: " << m_FunctionName << std::endl;
+  std::cout << "   x bar: " << m_xb << std::endl;
+  std::cout << "   sigma: " << m_sigma << std::endl;
+  std::cout << "   alpha: " << m_alpha << std::endl;
+  std::cout << "       n: " << m_n << std::endl;
+}
+
+double CrystalBallDist::callFunction(double x) {return this->crystalball(x);};
+
+double CrystalBallDist::crystalball(double x) {
+  double C = m_n / abs(m_alpha) * 1/(m_n-1) * exp(-pow(abs(m_alpha), 2) / 2);
+  double D = pow(M_PI / 2, 0.5) * (1 + erf(abs(m_alpha) / pow(2, 0.5)));
+
+  double N = 1 / (m_sigma * (C + D));
+
+  if ((x - m_xb) / m_sigma > -m_alpha) {
+    return N * exp(-pow(x - m_xb, 2)/(2*pow(m_sigma, 2)));
+  } else {
+    double A = pow((m_n / abs(m_alpha)), m_n) * exp(-pow(abs(m_alpha), 2) / 2);
+    double B = m_n / abs(m_alpha) - abs(m_alpha);
+    
+    return N * A * pow((B - (x - m_xb) / m_sigma), -m_n);
   }
 }

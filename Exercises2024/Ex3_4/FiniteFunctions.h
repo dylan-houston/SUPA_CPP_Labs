@@ -47,3 +47,44 @@ protected:
 private:
   double invxsquared(double x); //The default functional form
 };
+
+
+class NormalDist : public FiniteFunction {
+  public:
+    NormalDist();
+    NormalDist(double mu, double sigma, double range_min, double range_max, std::string outfile);
+    void printInfo();
+    double callFunction(double x);
+  private:
+    double m_mu=0.0;
+    double m_sigma=1.0;
+    double normal(double x);
+};
+
+
+class CauchyLorentzDist : public FiniteFunction {
+  public:
+    CauchyLorentzDist();
+    CauchyLorentzDist(double x0, double gamma, double range_min, double range_max, std::string outfile);
+    void printInfo();
+    double callFunction(double x);
+  private:
+    double m_x0=0.0;
+    double m_gamma=1.0;
+    double cauchyLorentz(double x);
+};
+
+
+class CrystalBallDist : public FiniteFunction {
+  public:
+    CrystalBallDist();
+    CrystalBallDist(double xb, double sigma, double alpha, double n, double range_min, double range_max, std::string outfile);
+    void printInfo();
+    double callFunction(double x);
+  private:
+    double m_xb=0.0;
+    double m_sigma=1.0;
+    double m_alpha=1.0;
+    double m_n=2.0;
+    double crystalball(double x);
+};
