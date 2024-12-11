@@ -24,6 +24,8 @@ public:
   virtual void printInfo(); //Dump parameter info about the current function (Overridable)
   virtual double callFunction(double x); //Call the function with value x (Overridable)
 
+  std::vector<double> createSampledDataPoints(unsigned int n_points, unsigned int seed=42, double sigma=1.0);
+
   //Protected members can be accessed by child classes but not users
 protected:
   double m_RMin;
@@ -53,8 +55,8 @@ class NormalDist : public FiniteFunction {
   public:
     NormalDist();
     NormalDist(double mu, double sigma, double range_min, double range_max, std::string outfile);
-    void printInfo();
-    double callFunction(double x);
+    virtual void printInfo();
+    virtual double callFunction(double x);
   private:
     double m_mu=0.0;
     double m_sigma=1.0;
@@ -66,8 +68,8 @@ class CauchyLorentzDist : public FiniteFunction {
   public:
     CauchyLorentzDist();
     CauchyLorentzDist(double x0, double gamma, double range_min, double range_max, std::string outfile);
-    void printInfo();
-    double callFunction(double x);
+    virtual void printInfo();
+    virtual double callFunction(double x);
   private:
     double m_x0=0.0;
     double m_gamma=1.0;
@@ -79,8 +81,8 @@ class CrystalBallDist : public FiniteFunction {
   public:
     CrystalBallDist();
     CrystalBallDist(double xb, double sigma, double alpha, double n, double range_min, double range_max, std::string outfile);
-    void printInfo();
-    double callFunction(double x);
+    virtual void printInfo();
+    virtual double callFunction(double x);
   private:
     double m_xb=0.0;
     double m_sigma=1.0;

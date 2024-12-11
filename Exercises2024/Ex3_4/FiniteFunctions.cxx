@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <math.h>
+#include <random>
 #include "FiniteFunctions.h"
 #include <filesystem> //To check extensions in a nice way
 
@@ -275,9 +276,9 @@ void NormalDist::printInfo() {
   std::cout << "     rangeMin: " << m_RMin << std::endl;
   std::cout << "     rangeMax: " << m_RMax << std::endl;
   std::cout << "     integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
-  std::cout << "     function: " << m_FunctionName << std::endl;
   std::cout << "         mean: " << m_mu << std::endl;
   std::cout << "std deviation: " << m_sigma << std::endl;
+  std::cout << "     function: " << m_FunctionName << std::endl;
 }
 
 double NormalDist::callFunction(double x) {return this->normal(x);};
@@ -317,9 +318,9 @@ void CauchyLorentzDist::printInfo() {
   std::cout << "rangeMin: " << m_RMin << std::endl;
   std::cout << "rangeMax: " << m_RMax << std::endl;
   std::cout << "integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
-  std::cout << "function: " << m_FunctionName << std::endl;
   std::cout << "      x0: " << m_x0 << std::endl;
   std::cout << "   gamma: " << m_gamma << std::endl;
+  std::cout << "function: " << m_FunctionName << std::endl;
 }
 
 double CauchyLorentzDist::callFunction(double x) {return this->cauchyLorentz(x);};
@@ -356,7 +357,7 @@ CrystalBallDist::CrystalBallDist(double xb, double sigma, double alpha, double n
     m_n = 2.0;
   }
 
-  if (alpha > 1) {
+  if (alpha > 0) {
     m_alpha = alpha;
   } else {
     std::cout << "alpha must be > 0, choosing alpha = 1 by default" << std::endl;
@@ -368,11 +369,11 @@ void CrystalBallDist::printInfo() {
   std::cout << "rangeMin: " << m_RMin << std::endl;
   std::cout << "rangeMax: " << m_RMax << std::endl;
   std::cout << "integral: " << m_Integral << ", calculated using " << m_IntDiv << " divisions" << std::endl;
-  std::cout << "function: " << m_FunctionName << std::endl;
   std::cout << "   x bar: " << m_xb << std::endl;
   std::cout << "   sigma: " << m_sigma << std::endl;
   std::cout << "   alpha: " << m_alpha << std::endl;
   std::cout << "       n: " << m_n << std::endl;
+  std::cout << "function: " << m_FunctionName << std::endl;
 }
 
 double CrystalBallDist::callFunction(double x) {return this->crystalball(x);};
@@ -391,4 +392,34 @@ double CrystalBallDist::crystalball(double x) {
     
     return N * A * pow((B - (x - m_xb) / m_sigma), -m_n);
   }
+}
+
+
+/*
+###################
+//Sampling
+###################
+*/
+std::vector<double> FiniteFunction::createSampledDataPoints(unsigned int n_points, unsigned int seed, double sigma) {
+  std::vector<double> sampled_points;
+
+  // random engine & the initial uniform dist
+  std::mt19937 mtEngine(seed);
+  std::uniform_real_distribution<double> uniformPDF{this->rangeMin(), this->rangeMax()};
+  std::uniform_real_distribution<double> uniformPDF0_1{0.0, 1.0};
+  double xi = uniformPDF(mtEngine);
+
+  while (sampled_points.size() < n_points) {
+    std::normal_distribution<double> normalPDF{xi, sigma};
+    double y = normalPDF(mtEngine);
+    
+    double A = std::min(this->callFunction(y) / this->callFunction(xi), 1.0);
+    double T = uniformPDF0_1(mtEngine);
+
+    if (T < A) {
+      sampled_points.push_back(y);
+      xi = y;
+    }
+  }
+  return sampled_points;
 }
